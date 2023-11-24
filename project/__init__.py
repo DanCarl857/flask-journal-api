@@ -37,11 +37,14 @@ The project utilizes the following modules:
 from apifairy import APIFairy
 from flask import Flask, json
 from flask_marshmallow import Marshmallow
+from flask_sqlalchemy import SQLAlchemy
+import os
 
 # Configuration
 
 apifairy = APIFairy()
 ma = Marshmallow()
+database = SQLAlchemy()
 
 # Application Factory Function
 
@@ -53,6 +56,10 @@ def create_app():
     app.config['APIFAIRY_VERSION'] = '0.1'
     app.config['APIFAIRY_UI'] = 'elements'
     
+    # Configure the SQLite database
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.getcwd(), 'instance', 'app.db')}"
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
     initialize_extensions(app)
     register_blueprints(app)
     return app
@@ -60,6 +67,7 @@ def create_app():
 def initialize_extensions(app):
     apifairy.init_app(app)
     ma.init_app(app)
+    database.init_app(app)
     
 def register_blueprints(app):
     from project.journal_api import journal_api_blueprint
